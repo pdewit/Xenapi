@@ -49,11 +49,15 @@ class Xen
 	 *
 	 * @return mixed
 	 */
-	public function getVMByNameLabel($name): XenVirtualMachine
+	public function getVMByNameLabel($name): ?XenVirtualMachine
 	{
 		$response = new XenResponse($this->xenconnection->VM__get_by_name_label($name));
 
-		return new XenVirtualMachine($this->xenconnection, $name, $response->getValue()[0]);
+		if($response->getValue()){
+			return new XenVirtualMachine($this->xenconnection, $name, $response->getValue()[0]);
+		}
+		return null;
+
 	}
 
 	/**
@@ -63,11 +67,13 @@ class Xen
 	 *
 	 * @return mixed
 	 */
-	public function getHOSTByNameLabel($name)
+	public function getHOSTByNameLabel($name): ?XenHost
 	{
 		$response = new XenResponse($this->xenconnection->host__get_by_name_label($name));
-
-		return new XenHost($this->xenconnection, $name, $response->getValue()[0]);
+		if($response->getValue()){
+			return new XenHost($this->xenconnection, $name, $response->getValue()[0]);
+		}
+		return null;
 	}
 
 
