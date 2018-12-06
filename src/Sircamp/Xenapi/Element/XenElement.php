@@ -40,5 +40,3 @@ class XenElement
 		return $this;
 	}
 }
-
-?>

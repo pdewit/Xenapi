@@ -9,7 +9,7 @@ use Sircamp\Xenapi\Element\XenVirtualMachine as XenVirtualMachine;
 class Xen
 {
 
-	private $xenconnection = null;
+	private $xenConnection = null;
 
 	public function __construct($url, $user, $password)
 	{
@@ -31,15 +31,28 @@ class Xen
 			throw new \InvalidArgumentException("'password' value mast be an non empty string", 1);
 		}
 
-		$this->xenconnection = new XenConnection();
+		$this->xenConnection = new XenConnection();
 		try
 		{
-			$this->xenconnection->_setServer($url, $user, $password);
+			$this->xenConnection->_setServer($url, $user, $password);
 		}
 		catch (\Exception $e)
 		{
 			die($e->getMessage());
 		}
+	}
+
+    public function getAllHosts()
+    {
+        $response = new XenResponse($this->xenConnection->host__get_all());
+
+        $record = new XenResponse($this->xenConnection->host__get_metrics($response->getValue()[0]));
+
+        if($response->getValue()){
+            return $response->getValue()[0];
+        }
+
+        return null;
 	}
 
 	/**
@@ -49,12 +62,12 @@ class Xen
 	 *
 	 * @return mixed
 	 */
-	public function getVMByNameLabel($name): ?XenVirtualMachine
+	public function getVMByNameLabel($name)
 	{
-		$response = new XenResponse($this->xenconnection->VM__get_by_name_label($name));
+		$response = new XenResponse($this->xenConnection->VM__get_by_name_label($name));
 
 		if($response->getValue()){
-			return new XenVirtualMachine($this->xenconnection, $name, $response->getValue()[0]);
+			return new XenVirtualMachine($this->xenConnection, $name, $response->getValue()[0]);
 		}
 		return null;
 
@@ -67,16 +80,14 @@ class Xen
 	 *
 	 * @return mixed
 	 */
-	public function getHOSTByNameLabel($name): ?XenHost
+	public function getHOSTByNameLabel($name)
 	{
-		$response = new XenResponse($this->xenconnection->host__get_by_name_label($name));
+		$response = new XenResponse($this->xenConnection->host__get_by_name_label($name));
 		if($response->getValue()){
-			return new XenHost($this->xenconnection, $name, $response->getValue()[0]);
+			return new XenHost($this->xenConnection, $name, $response->getValue()[0]);
 		}
 		return null;
 	}
 
 
 }
-
-?>
