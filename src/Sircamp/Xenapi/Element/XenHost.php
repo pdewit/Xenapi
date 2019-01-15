@@ -482,6 +482,12 @@ class XenHost extends XenElement
 		return $this->getXenconnection()->host__get_supported_bootloaders($this->getHostId());
 	}
 
+
+	public function getRecord()
+	{
+		return $this->getXenconnection()->host__get_record($this->getHostId());
+	}
+
 	/**
 	 * Get the resident VMs field of the given host.
 	 *
@@ -601,7 +607,9 @@ class XenHost extends XenElement
 	 */
 	public function getMetrics()
 	{
-		return $this->getXenconnection()->host__get_metrics($this->getHostId());
+		$metrics = $this->getXenconnection()->host__get_metrics($this->getHostId());
+
+		return $this->getXenconnection()->host_metrics__get_record($metrics->getValue());
 	}
 
 	/**

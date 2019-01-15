@@ -13,16 +13,6 @@ class XenConnection
 	private $user;
 	private $password;
 
-	function __construct()
-	{
-
-		$this->session_id = null;
-		$this->url        = null;
-		$this->user       = null;
-		$this->password   = null;
-
-	}
-
 	/**
 	 * Gets the value of url.
 	 *
@@ -162,7 +152,7 @@ class XenConnection
 		else
 		{
 
-			throw new XenConnectionException("Error during contact Xen, check your credentials (user, password and ip)", 1);
+			throw new XenConnectionException('Error during contact Xen, check your credentials (user, password and ip)', 1);
 
 		}
 	}
@@ -195,7 +185,7 @@ class XenConnection
 			else
 			{
 
-				if ($response['ErrorDescription'][0] == 'SESSION_INVALID')
+				if ($response['ErrorDescription'][0] === 'SESSION_INVALID')
 				{
 
 					$response = $this->xenrpc_request($this->url, $this->xenrpc_method('session.login_with_password',
@@ -222,7 +212,6 @@ class XenConnection
 		return new XenResponse($response);
 	}
 
-
 	/**
 	 * This encode the request into a xml_rpc
 	 *
@@ -235,9 +224,7 @@ class XenConnection
 	function xenrpc_method($name, $params)
 	{
 
-		$encoded_request = xmlrpc_encode_request($name, $params);
-
-		return $encoded_request;
+		return xmlrpc_encode_request($name, $params);
 	}
 
 
@@ -297,7 +284,7 @@ class XenConnection
 			$args = array();
 		}
 
-		list($mod, $method) = explode('__', $name);
+		[$mod, $method] = explode('__', $name);
 		$response = $this->xenrpc_parseresponse($this->xenrpc_request($this->getUrl(),
 			$this->xenrpc_method($mod . '.' . $method, array_merge(array($this->getSessionId()), $args))));
 

@@ -737,6 +737,11 @@ class XenVirtualMachine extends XenElement
 		return $this->getXenconnection()->VM__set_is_a_template($this->getVmId(), $template);
 	}
 
+	public function getRecord()
+	{
+		return $this->getXenconnection()->VM__get_record($this->getVmId());
+	}
+
 
 	/**
 	 * Get the resident on field of the given VM.

@@ -1,10 +1,11 @@
 <?php namespace Sircamp\Xenapi;
 
-use Respect\Validation\Validator as Validator;
-use Sircamp\Xenapi\Connection\XenConnection as XenConnection;
-use Sircamp\Xenapi\Connection\XenResponse as XenResponse;
-use Sircamp\Xenapi\Element\XenHost as XenHost;
-use Sircamp\Xenapi\Element\XenVirtualMachine as XenVirtualMachine;
+use Illuminate\Support\Collection;
+use Respect\Validation\Validator;
+use Sircamp\Xenapi\Connection\XenConnection;
+use Sircamp\Xenapi\Connection\XenResponse;
+use Sircamp\Xenapi\Element\XenHost;
+use Sircamp\Xenapi\Element\XenVirtualMachine;
 
 class Xen
 {
@@ -42,14 +43,61 @@ class Xen
 		}
 	}
 
+    public function getPool()
+    {
+        $response = new XenResponse($this->xenConnection->pool__get_all_records());
+
+
+        if($response->getValue()) {
+            return array_first($response->getValue());
+        }
+
+        return null;
+	}
+
     public function getAllHosts()
     {
         $response = new XenResponse($this->xenConnection->host__get_all());
 
-        $record = new XenResponse($this->xenConnection->host__get_metrics($response->getValue()[0]));
 
-        if($response->getValue()){
-            return $response->getValue()[0];
+        if($response->getValue()) {
+            return (new Collection($response->getValue()))->map(function ($item) {
+                return new XenHost($this->xenConnection, null, $item);
+            });
+        }
+
+        return null;
+	}
+
+    public function getAllVMs()
+    {
+        $response = new XenResponse($this->xenConnection->VM__get_all());
+
+        if($response->getValue()) {
+            return (new Collection($response->getValue()))->map(function ($item) {
+                return (new XenVirtualMachine($this->xenConnection, null, $item));
+            });
+        }
+
+        return null;
+	}
+
+    public function getAllVBDs()
+    {
+        $vbds = $this->xenConnection->VBD__get_all_records();
+        $vdis = $this->xenConnection->VDI__get_all_records();
+
+        if($vbds->getValue()) {
+            return (new Collection($vbds->getValue()))->map(function ($item, $key) use ($vdis) {
+                $object = (object)$item;
+                $object->vdi = (new Collection($vdis->getValue()))->filter(function ($vdi) use ($key) {
+                    if(count($vdi['VBDs']) > 0){
+                        return in_array($key, $vdi['VBDs']);
+                    }
+                });
+
+                return $object;
+            });
         }
 
         return null;
