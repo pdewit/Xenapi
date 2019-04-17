@@ -82,6 +82,19 @@ class Xen
         return null;
 	}
 
+    public function getAllSRs()
+    {
+        $response = new XenResponse($this->xenConnection->SR__get_all_records());
+
+        if($response->getValue()) {
+            return (new Collection($response->getValue()))->map(function ($item) {
+                return $item;
+            });
+        }
+
+        return null;
+	}
+
     public function getAllVBDs()
     {
         $vbds = $this->xenConnection->VBD__get_all_records();
