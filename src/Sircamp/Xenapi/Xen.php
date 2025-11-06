@@ -33,14 +33,7 @@ class Xen
 		}
 
 		$this->xenConnection = new XenConnection();
-		try
-		{
-			$this->xenConnection->_setServer($url, $user, $password);
-		}
-		catch (\Exception $e)
-		{
-			die($e->getMessage());
-		}
+		$this->xenConnection->_setServer($url, $user, $password);
 	}
 
     public function getPool()
