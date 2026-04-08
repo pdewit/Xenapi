@@ -14,14 +14,6 @@ class Xen
 
 	public function __construct($url, $user, $password)
 	{
-
-
-		if (!Validator::ip()->validate($url))
-		{
-
-			throw new \InvalidArgumentException("'url' value mast be an ipv4 address", 1);
-
-		}
 		if (!Validator::stringType()->validate($user))
 		{
 			throw new \InvalidArgumentException("'user' value mast be an non empty string", 1);
